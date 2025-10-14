@@ -9,8 +9,8 @@
 ---
 
 ## 👥 Team Members
-- **Ebunoluwa Shokefun** — Backend Developer  
-- **Dahir [Last Name]** — Logic Lead  
+- Ebunoluwa Shokefun — Backend Developer  
+- Dahir Abdullahi — Logic Lead  
 
 ---
 

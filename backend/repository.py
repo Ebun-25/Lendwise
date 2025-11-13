@@ -91,3 +91,36 @@ def calculate_fine(loan_id, fine_per_day=1.0):
         session.refresh(fine_record)
     session.close()
     return fine_record
+
+from .security import hash_password, verify_password
+from .models import User
+from .database import SessionLocal
+
+def create_user(name, email, phone, role="patron", password="changeme"):
+    """Add a new user with a hashed password."""
+    session = SessionLocal()
+    try:
+        user = User(
+            name=name,
+            email=email,
+            phone=phone,
+            role=role,
+            password_hash=hash_password(password)
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
+    finally:
+        session.close()
+
+def authenticate(email, password):#checks email and password when someone logs in
+    """Validate user credentials."""
+    session = SessionLocal()
+    try:
+        user = session.query(User).filter(User.email == email).first()
+        if user and verify_password(password, user.password_hash):
+            return user
+        return None
+    finally:
+        session.close()

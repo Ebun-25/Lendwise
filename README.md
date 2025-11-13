@@ -33,34 +33,6 @@ The system allows administrators to:
 - 📊 Generate reports for administrators.  
 - 💻 Ensure cross-platform compatibility (Windows & macOS).  
 
----
-📂 System Architecture  
-LendWise/
-│
-├── backend/
-│   ├── models.py          # Database models (User, Item, Loan, Fine)
-│   ├── database.py        # Database engine + session setup
-│   ├── repository.py      # CRUD operations and business logic
-│   ├── security.py        # Password hashing & authentication
-│   └── init_db.py         # Creates tables and initializes the database
-│
-├── logic/
-│   ├── checkout.py        # Checkout workflows
-│   ├── returns.py         # Return workflows
-│   ├── fines.py           # Fine tracking
-│   └── overdue.py         # Overdue loan detection
-│
-├── gui/
-│   ├── login_dialog.py    # Login screen
-│   ├── main_window.py     # Main application interface
-│   ├── return_window.py   # Return management (optional)
-│   └── fines_window.py    # Fine management UI (optional)
-│
-├── tests/
-│   └── test_backend.py    # Functional testing for repository layer
-│
-└── README.md
-
 
 ---
 ## ⚙️ Tools & Technologies

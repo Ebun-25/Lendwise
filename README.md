@@ -48,7 +48,7 @@ The system allows administrators to:
 
 
 ---
-🧩 System Architecture
+📂 System Architecture  
 LendWise/
 │
 ├── backend/

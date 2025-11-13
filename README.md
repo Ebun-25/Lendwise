@@ -28,11 +28,11 @@ The system allows administrators to:
 
 ## 🎯 Key Objectives
 
-🧑‍💻 Provide a user-friendly interface for managing users and inventory.
-🔄 Streamline item checkout and return workflows.
-⏰ Automatically detect overdue loans and apply fines.
-🔐 Implement secure login and authentication for patrons and librarians.
-📊 Generate administrative insights and reports.
+👩‍💻 Provide a user-friendly interface for managing users and inventory.  
+🧾 Streamline item checkout and return workflows.  
+⏰ Automatically detect overdue loans and apply fines.  
+🔒 Implement secure login and authentication for patrons and librarians.  
+📊 Generate administrative insights and reports.  
 💻 Ensure cross-platform compatibility (Windows & macOS).
 
 ---

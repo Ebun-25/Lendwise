@@ -59,7 +59,7 @@ The system allows administrators to:
 | **Version Control** | Git & GitHub |
 
 ---
-🪄 How to Run(Using Bash)
+🪄 How to Run
 
 # Clone the repository
 git clone https://github.com/Ebun-25/Lendwise.git

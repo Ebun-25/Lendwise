@@ -33,16 +33,16 @@ class Loan(Base):
     __tablename__ = "loans"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))   # link to a User
-    item_id = Column(Integer, ForeignKey("items.id"))   # link to an Item
-    checkout_date = Column(DateTime, default=datetime.datetime.utcnow)  # when checked out
-    due_date = Column(DateTime)                         # when it should be returned
-    return_date = Column(DateTime, nullable=True)       # actual return date
+    user_id = Column(Integer, ForeignKey("users.id"))
+    item_id = Column(Integer, ForeignKey("items.id"))
+    checkout_date = Column(DateTime, default=datetime.datetime.utcnow)
+    due_date = Column(DateTime)
+    return_date = Column(DateTime, nullable=True)
 
-    # Relationships
     user = relationship("User", back_populates="loans")
     item = relationship("Item", back_populates="loans")
     fine = relationship("Fine", back_populates="loan", uselist=False)
+
 
 class Fine(Base):
     __tablename__ = "fines"

@@ -124,3 +124,36 @@ def authenticate(email, password):#checks email and password when someone logs i
         return None
     finally:
         session.close()
+
+from sqlalchemy import or_
+
+def search_items(keyword):
+    """Search for items by title or category."""
+    session = SessionLocal()
+    try:
+        results = session.query(Item).filter(
+            or_(
+                Item.title.ilike(f"%{keyword}%"),
+                Item.category.ilike(f"%{keyword}%")
+            )
+        ).all()
+        return results
+    finally:
+        session.close()
+
+def generate_reports():
+    """Return summaries of loans, returns, and fines."""
+    session = SessionLocal()
+    try:
+        total_loans = session.query(Loan).count()
+        returned_loans = session.query(Loan).filter(Loan.return_date.isnot(None)).count()
+        unpaid_fines = session.query(Fine).filter(Fine.paid_status == "unpaid").count()
+
+        report = {
+            "Total Loans": total_loans,
+            "Returned Loans": returned_loans,
+            "Unpaid Fines": unpaid_fines
+        }
+        return report
+    finally:
+        session.close()

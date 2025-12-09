@@ -1,33 +1,47 @@
-from datetime import datetime
 from backend.database import SessionLocal
-from backend.models import Item, Loan, Fine
+from backend.models import Loan, Item, Fine
+import datetime
 
-
-def return_item(loan_id):
+def return_item(item_id: int):
     session = SessionLocal()
+
     try:
-        loan = session.get(Loan, loan_id)
+        loan = (
+            session.query(Loan)
+            .filter(Loan.item_id == item_id, Loan.return_date == None)
+            .first()
+        )
+
         if not loan:
-            return "❌ Loan not found."
+            return f"⚠️ No active loan found for item ID {item_id}."
 
-        # mark as returned
-        loan.return_date = datetime.now()
+        # Mark as returned
+        loan.return_date = datetime.datetime.utcnow()
 
-        # increase item quantity
-        item = session.get(Item, loan.item_id)
+        # Restore item quantity
+        item = loan.item
         item.quantity += 1
+        item.status = "available"
 
-        # calculate overdue fine if late
+        # Check overdue
         if loan.return_date > loan.due_date:
-            days_overdue = (loan.return_date - loan.due_date).days
-            fine_amount = days_overdue * 0.50  # $0.50 per day
+            days_late = (loan.return_date - loan.due_date).days
+            fine_amount = days_late * 1.0  # $1 per day late
             fine = Fine(loan_id=loan.id, amount=fine_amount, paid_status="unpaid")
             session.add(fine)
+            message = (
+                f"✅ '{item.title}' returned. "
+                f"⚠️ Overdue by {days_late} days. Fine: ${fine_amount:.2f}"
+            )
+        else:
+            message = f"✅ '{item.title}' returned successfully."
 
         session.commit()
-        return f"✅ Returned '{item.title}' successfully."
+        return message
+
     except Exception as e:
         session.rollback()
-        return f"Error: {e}"
+        return f"Error: {str(e)}"
+
     finally:
         session.close()

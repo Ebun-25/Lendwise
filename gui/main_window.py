@@ -8,6 +8,9 @@ from logic.checkout import checkout_item
 from logic.returns import return_item
 from logic.fines import list_fines
 from logic.overdue import check_overdue
+from logic.search import find_items
+from logic.reports import view_reports
+
 
 
 class MainWindow(QMainWindow):
@@ -63,7 +66,10 @@ class MainWindow(QMainWindow):
             ("Checkout Item", self.checkout),
             ("Return Item", self.return_item_action),
             ("View Fines", self.show_fines),
-            ("Check Overdue Loans", self.check_overdue)
+            ("Check Overdue Loans", self.check_overdue),
+            ("Search Items", self.search_items),
+            ("View Reports", self.view_reports),
+
         ]
 
         for text, action in buttons:
@@ -116,6 +122,18 @@ class MainWindow(QMainWindow):
 
         result = return_item(int(item_id))
         self.result_label.setText(result)
+
+    def search_items(self):
+        keyword = self.item_input.text().strip()
+        if not keyword:
+            self.result_label.setText("⚠️ Please enter a search keyword.")
+            return
+        results = find_items(keyword)
+        self.result_label.setText("\n".join(results))
+
+    def view_reports(self):
+        reports = view_reports()
+        self.result_label.setText("\n".join(reports))
 
     def show_fines(self):
         fines = list_fines()

@@ -1,37 +1,37 @@
-from datetime import datetime, timedelta
 from backend.database import SessionLocal
-from backend.models import Item, Loan
+from backend.models import Loan, Item, User
+import datetime
 
-
-def checkout_item(user_id, item_id, loan_days=14):
+def checkout_item(user_id: int, item_id: int):
     session = SessionLocal()
+
     try:
-        item = session.get(Item, item_id)
+        user = session.query(User).filter_by(id=user_id).first()
+        item = session.query(Item).filter_by(id=item_id).first()
+
+        if not user:
+            return "❌ Invalid Patron ID."
+
         if not item:
-            return f"❌ Item {item_id} not found."
+            return "❌ Invalid Item ID."
 
-        # Adjust for your field name; your model uses 'quantity', not 'stock'
         if item.quantity <= 0:
-            return f"❌ Item '{item.title}' is out of stock."
+            return f"⚠️ '{item.title}' is currently unavailable."
 
-        # reduce stock
-        item.quantity -= 1
-        due_date = datetime.now() + timedelta(days=loan_days)
+        # Create loan
+        due_date = datetime.datetime.utcnow() + datetime.timedelta(days=14)
+        loan = Loan(user_id=user.id, item_id=item.id, due_date=due_date)
 
-        # create a loan record
-        loan = Loan(
-            user_id=user_id,
-            item_id=item_id,
-            checkout_date=datetime.now(),
-            due_date=due_date,
-            returned=False
-        )
         session.add(loan)
-        session.commit()
+        item.quantity -= 1
+        item.status = "checked_out"
 
-        return f"✅ Checked out '{item.title}', due on {due_date.date()}."
+        session.commit()
+        return f"✅ '{item.title}' checked out to {user.name} (Due: {due_date.date()})"
+
     except Exception as e:
         session.rollback()
-        return f"Error: {e}"
+        return f"Error: {str(e)}"
+
     finally:
         session.close()

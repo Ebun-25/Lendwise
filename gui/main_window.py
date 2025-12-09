@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget,
-    QLabel, QLineEdit, QHBoxLayout, QFrame
+    QLabel, QLineEdit, QHBoxLayout, QFrame, QDialog
 )
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt
@@ -10,13 +10,13 @@ from logic.fines import list_fines
 from logic.overdue import check_overdue
 from logic.search import find_items
 from logic.reports import view_reports
-
+from gui.register_user_dialog import RegisterUserDialog
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, user=None):
+    def __init__(self, user):
         super().__init__()
-        self.user = user #store logged in user
+        self.user = user
         self.setWindowTitle("📚 LendWise Library System")
         self.setGeometry(100, 100, 480, 400)
         self.setStyleSheet(self.dark_theme())
@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
         item_label = QLabel("Item ID:")
         item_label.setFont(QFont("Segoe UI", 10))
         self.item_input = QLineEdit()
-        self.item_input.setPlaceholderText("Enter Item ID")
+        self.item_input.setPlaceholderText("Enter Item ID or Keyword")
         item_layout.addWidget(item_label)
         item_layout.addWidget(self.item_input)
         main_layout.addLayout(item_layout)
@@ -69,7 +69,6 @@ class MainWindow(QMainWindow):
             ("Check Overdue Loans", self.check_overdue),
             ("Search Items", self.search_items),
             ("View Reports", self.view_reports),
-
         ]
 
         for text, action in buttons:
@@ -91,6 +90,26 @@ class MainWindow(QMainWindow):
             """)
             main_layout.addWidget(btn)
 
+        # ===== Librarian-Only Features =====
+        if self.user.role == "librarian":
+            btn_register = QPushButton("➕ Register Patron")
+            btn_register.setCursor(Qt.PointingHandCursor)
+            btn_register.clicked.connect(self.open_register_dialog)
+            btn_register.setStyleSheet("""
+                QPushButton {
+                    background-color: #16a34a;
+                    color: white;
+                    font-size: 14px;
+                    font-weight: bold;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                }
+                QPushButton:hover {
+                    background-color: #15803d;
+                }
+            """)
+            main_layout.addWidget(btn_register)
+
         # ===== Result Label =====
         self.result_label = QLabel("")
         self.result_label.setWordWrap(True)
@@ -102,15 +121,18 @@ class MainWindow(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
 
-    # ===== Functions =====
+    # ===== Helper Functions =====
+    def open_register_dialog(self):
+        dlg = RegisterUserDialog(self)
+        dlg.exec()
+
+    # ===== Functional Logic =====
     def checkout(self):
         patron_id = self.patron_input.text().strip()
         item_id = self.item_input.text().strip()
-
         if not patron_id or not item_id:
             self.result_label.setText("⚠️ Please enter both Patron ID and Item ID.")
             return
-
         result = checkout_item(int(patron_id), int(item_id))
         self.result_label.setText(result)
 
@@ -119,7 +141,6 @@ class MainWindow(QMainWindow):
         if not item_id:
             self.result_label.setText("⚠️ Please enter the Loan/Item ID to return.")
             return
-
         result = return_item(int(item_id))
         self.result_label.setText(result)
 
@@ -161,24 +182,16 @@ class MainWindow(QMainWindow):
         }
         """
 
+
 if __name__ == "__main__":
-    from PySide6.QtWidgets import QDialog
     from gui.login_dialog import LoginDialog
 
     app = QApplication([])
 
-    # --- Show login window first ---
     dlg = LoginDialog()
     if dlg.exec() == QDialog.Accepted:
-        # Logged in successfully
         user = dlg.user
-        print(f"✅ Logged in as: {user.name} ({user.role})")
-
-        # Pass the logged-in user into the main window
         window = MainWindow(user)
         window.setWindowTitle(f"📚 LendWise - Logged in as {user.name} ({user.role})")
         window.show()
         app.exec()
-    else:
-        print("❌ Login cancelled.")
-

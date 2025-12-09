@@ -13,7 +13,7 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)  # must be unique
     phone = Column(String)                        # optional phone number
     role = Column(String, default="patron")       # "patron" or "staff"
-    password_hash = Column(String)
+    password_hash = Column(String, nullable=True)
     # One user can have many loans
     loans = relationship("Loan", back_populates="user")
 
